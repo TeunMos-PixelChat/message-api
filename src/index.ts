@@ -18,8 +18,7 @@ app.use(express.json());
 
 
 app.get("/", (req: Request, res: Response) => {
-  const ip = req.ip;
-  res.send(`Hello, ${ip}`);
+  res.send(`Hello, world! ${isProduction ? "Production" : "Development"}`);
 });
 
 app.post("/test", (req: Request, res: Response) => {
