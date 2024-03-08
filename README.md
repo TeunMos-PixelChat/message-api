@@ -1,4 +1,4 @@
-# The PixelChat backend
+# PixelChat Message API
 
 > **This is just a proect setup, no actual logic is implemented yet!**
 
