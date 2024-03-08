@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "start": "ts-node NODE_ENV=production src/index.ts",
-    "prd": "export NODE_ENV=production && ts-node src/index.ts"
+    "build": "tsc",
+    "start": "export NODE_ENV=production && node dist/index.js"
   },
   "author": "TeunMos",
   "license": "ISC",
