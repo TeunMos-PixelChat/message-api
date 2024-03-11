@@ -15,7 +15,13 @@ app.use(cors({
   origin: "*"
 }));
 
-app.use(express.json());
+app.use(express.json()); // for parsing application/json
+
+// log all requests
+app.use((req, res, next) => {
+  console.log(`[${req.method}]: ${req.path}`);
+  next();
+});
 
 
 app.get("/", (req: Request, res: Response) => {
@@ -29,7 +35,7 @@ app.post("/test", (req: Request, res: Response) => {
 
   res.json({
     message: "Hello, world!",
-    data: body
+    echo: body
   });
 });
 

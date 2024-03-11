@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Start the API
-CMD [ "npm", "prd" ]
+CMD [ "npm", "start" ]
