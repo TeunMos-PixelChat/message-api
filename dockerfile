@@ -13,6 +13,9 @@ RUN npm install
 # Copy the project files to the container
 COPY . .
 
+# build the project
+RUN npm run build
+
 # Expose the port on which the API will run
 EXPOSE 3000
 
