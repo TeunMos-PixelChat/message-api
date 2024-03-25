@@ -1,0 +1,44 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: extract docker tag
+      run: |
+        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')
+        DOCKER_TAG_UNFORMATTED=${{ github.repository }}:$BRANCH_NAME-$(date +%s)
+        DOCKER_TAG=$(echo $DOCKER_TAG_UNFORMATTED | tr '[:upper:]' '[:lower:]')
+        echo "tag=$DOCKER_TAG">> $GITHUB_OUTPUT
+      id: docker_tag
+
+    - name: Log in to GitHub Container Registry
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag newbuild:new
+    - name: Tag the Docker image
+      run: docker tag newbuild:new ghcr.io/${{ steps.docker_tag.outputs.tag }}
+    - name: Push the Docker image
+      run: docker push ghcr.io/${{ steps.docker_tag.outputs.tag }}
+    - name: Push it as the latest tag (per branch)
+      run: | 
+        BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')
+        REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+        docker tag ghcr.io/${{ steps.docker_tag.outputs.tag }} ghcr.io/$REPO_LOWER:$BRANCH_NAME
+        docker push ghcr.io/$REPO_LOWER:$BRANCH_NAME
+    - name: if branch is main push as latest
+      if: github.ref == 'refs/heads/main'
+      run: |
+        REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+        docker tag ghcr.io/${{ steps.docker_tag.outputs.tag }} ghcr.io/$REPO_LOWER:latest
+        docker push ghcr.io/$REPO_LOWER:latest
