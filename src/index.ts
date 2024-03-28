@@ -36,7 +36,7 @@ app.post("/test", (req: Request, res: Response) => {
   res.json({
     message: "Hello, world!",
     echo: body,
-    meta: "This is a test endpoint."
+    meta: "This is a test endpoint. blabla"
   });
 });
 
