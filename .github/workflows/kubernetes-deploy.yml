@@ -28,4 +28,4 @@ jobs:
         - name: wait for the deployment to finish
           run: |
             kubectl wait --for=condition=available --timeout=600s deployment/${{ env.PROJECT_NAME }}
-            kubeclt get services
+            kubectl get services
