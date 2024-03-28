@@ -6,11 +6,11 @@ env:
     CLUSTER_NAME: PixelChat-Cluster
 
 on:
-    push:
-        branches:
-            - develop
+    # push:
+    #     branches:
+    #         - develop
     workflow_run:
-        workflows: ["docker-push"]
+        workflows: ["Docker Image CI"]
         types: 
             - completed
 jobs:
