@@ -10,6 +10,17 @@ console.log(`isProduction: ${isProduction}`);
 const app: Express = express();
 const port = process.env.PORT || 3001;
 
+
+function useAuthUser(req: Request, res: Response) {
+  const userId = req.headers['x-user-id'];
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  return userId as string;
+}
+
 app.use(cors({
   // origin: process.env.FRONTEND_URL || 'http://localhost:3000'
   origin: "*"
@@ -30,13 +41,14 @@ app.get("/", (req: Request, res: Response) => {
 
 app.post("/test", (req: Request, res: Response) => {
   const body = req.body;
+  const user = useAuthUser(req, res);
+  if (!user) return; // unauthorized
   
-  console.log(body);
-
   res.json({
     message: "Hello, world!",
     echo: body,
-    meta: "This is a test endpoint. bloep blap bloop."
+    meta: "This is a test endpoint. bloep blap bloop.\nYou are authorized.",
+    userId: user,
   });
 });
 
