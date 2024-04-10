@@ -5,11 +5,6 @@ import { app, server } from "../index";
 //   expect(2).toBe(2);
 // });
 
-// it("Async test", async () => {
-//   const result = await Promise.resolve(2);
-//   expect(result).toBe(2);
-// });
-
 
 it("Root Endpoint test", async () => {
   const response = await supertest(app).get("/");
