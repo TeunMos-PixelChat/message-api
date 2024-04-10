@@ -6,13 +6,13 @@ import { app, server } from "../index";
 // });
 
 
-it("Root Endpoint test", async () => {
+it("Root Endpoint /test", async () => {
   const response = await supertest(app).get("/");
   expect(response.text).toBe("Hello, world! Development");
 });
 
 
-it("Test Endpoint test (with user)", async () => {
+it("Test Endpoint /test (with user)", async () => {
   const response = await supertest(app).post("/test").send({ message: "Hello, world!" }).set("x-user-id", "user123");
   expect(response.body).toStrictEqual({
     message: "Hello, world!",
