@@ -1,9 +1,7 @@
-name: deploy to Azure Kubernetes Service (AKS) by restarting and pulling the new image
+name: deploy to netlab kubernetes cluster (k3s vm) by restarting and pulling the new image
 
 env:
-    PROJECT_NAME: pixelchat-message-api
-    RESOURCE_GROUP: PixelChat_US
-    CLUSTER_NAME: PixelChat-Cluster
+  PROJECT_NAME: pixelchat-message-api
 
 on:
     # push:
@@ -15,14 +13,8 @@ on:
             - completed
 jobs:
     deploy:
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         steps:
-        - name: Login to Azure
-          uses: azure/login@v1
-          with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-        - name: login to kubectl
-          run: az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.CLUSTER_NAME }}
         - name: restart the container
           run: kubectl rollout restart deployment ${{ env.PROJECT_NAME }}
         - name: wait for the deployment to finish
