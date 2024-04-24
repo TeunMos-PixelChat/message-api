@@ -1,4 +1,4 @@
-name: deploy to netlab kubernetes cluster (k3s vm) by restarting and pulling the new image
+name: deploy to netlab kubernetes cluster
 
 env:
   PROJECT_NAME: pixelchat-message-api
