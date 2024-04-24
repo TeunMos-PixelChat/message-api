@@ -1,0 +1,35 @@
+name: run performance test on the netlab kubernetes cluster
+
+on:
+    # push:
+    #     branches:
+    #         - develop
+    workflow_run:
+        workflows: ["deploy to netlab kubernetes cluster"]
+        types: 
+            - completed
+
+jobs:
+    performance-test:
+        runs-on: self-hosted
+        steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-node@v4
+          with:
+              node-version: '18.x'
+        - name: install artillery
+          run: npm install -g artillery
+        - name: ping the service to check if it is up
+          run: curl http://10.43.244.164:3001
+        - name: run the performance test
+          run: npm run performance
+          continue-on-error: true
+        - name: create the performance report
+          run: artillery report performance-report.json
+        - name: upload the performance test results to the artifacts
+          uses: actions/upload-artifact@v4
+          with:
+              name: performance-test-results
+              path: performance-report.json.html
+        
+        

@@ -1,0 +1,32 @@
+config:
+  target: http://10.43.244.164:3001
+  phases:
+    - duration: 30
+      arrivalRate: 1
+      rampTo: 5
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 30
+      name: Spike phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  plugins:
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 100
+scenarios:
+  - flow:
+      - loop:
+        # - get:
+        #     url: "/"
+        - get:
+            url: "/test"
+            headers:
+              x-user-id: "test|123"
+        count: 10
