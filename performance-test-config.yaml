@@ -6,12 +6,12 @@ config:
       rampTo: 5
       name: Warm up phase
     - duration: 60
-      arrivalRate: 5
-      rampTo: 15
+      arrivalRate: 10
+      rampTo: 25
       name: Ramp up load
     - duration: 30
-      arrivalRate: 10
-      rampTo: 30
+      arrivalRate: 20
+      rampTo: 60
       name: Spike phase
   # Load & configure a couple of useful plugins
   # https://docs.art/reference/extensions
