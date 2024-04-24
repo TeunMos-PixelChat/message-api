@@ -7,7 +7,7 @@ config:
       name: Warm up phase
     - duration: 60
       arrivalRate: 5
-      rampTo: 10
+      rampTo: 15
       name: Ramp up load
     - duration: 30
       arrivalRate: 10
@@ -25,8 +25,10 @@ scenarios:
       - loop:
         # - get:
         #     url: "/"
-        - get:
+        - post:
             url: "/test"
             headers:
               x-user-id: "test|123"
+            json:
+              message: "Hello, World!"
         count: 10
