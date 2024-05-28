@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 
 app.get("/", (req: Request, res: Response) => {
   const messagesTest = cassandraService.getDMmessages("1", "2", 10);
-  res.send(`Hello, world! ${isProduction ? "Production" : "Development"}\n\n\n${messagesTest}`);
+  res.send(`Hello, world! ${isProduction ? "Production" : "Development"}\n\n\n${JSON.stringify(messagesTest)}`);
 });
 
 app.post("/dm", async (req: Request, res: Response) => {
