@@ -119,4 +119,40 @@ export default class CassandraService {
 
     return messages.rows as unknown as GroupChatMessage[];
   }
+
+  async getUserInfoById(user_id: string) {
+    const query = `SELECT * FROM pixelchat_message.user_info WHERE id = ?`;
+
+    const queryparams = [user_id];
+
+    const user = await this.client.execute(query, queryparams, { prepare: true });
+
+    return user.rows[0];
+  }
+
+  async InsertOrUpdateUserInfo(user_id: string, name: string, nickname: string, picture: string) {
+    const user = await this.client.execute(
+      `SELECT * FROM pixelchat_message.user_info WHERE id = ?`, 
+      [user_id], 
+      { prepare: true }
+    );
+
+    if (user.rows.length > 0) {
+      const query = `UPDATE pixelchat_message.user_info SET 
+        name = ?, nickname = ?, picture = ?, updated_at = toTimestamp(now()) WHERE id = ?`;
+
+      const queryparams = [name, nickname, picture, user_id];
+
+      return this.client.execute(query, queryparams, { prepare: true });
+    }
+
+    const query = `INSERT INTO pixelchat_message.user_info (
+      id, name, nickname, picture, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, toTimestamp(now()), toTimestamp(now()))`;
+
+    const queryparams = [user_id, name, nickname, picture];
+    return this.client.execute(query, queryparams, { prepare: true });
+
+  }
+
 }

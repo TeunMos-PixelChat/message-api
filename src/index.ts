@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import dotenv from "dotenv";
 import cors from 'cors';
 import CassandraService from './services/cassandraService';
+import RabbitMQService from './services/rabbitmq';
 
 dotenv.config();
 
@@ -18,6 +19,17 @@ const kubernetescontactpoints = [
 const contactpoints = process.env.CASSANDRA_CONTACT_POINTS?.split(',') || kubernetescontactpoints;
 
 const cassandraService = new CassandraService(contactpoints);
+
+if (!process.env.RABBITMQ_HOST || !process.env.RABBITMQ_USER || !process.env.RABBITMQ_PASS) {
+  console.error('RabbitMQ credentials not set!')
+}
+
+const rabbitMQService = new RabbitMQService(
+  process.env.RABBITMQ_HOST as string,
+  process.env.RABBITMQ_USER as string,
+  process.env.RABBITMQ_PASS as string,
+);
+
 const app: Express = express();
 const port = process.env.PORT || 3001;
 
@@ -101,7 +113,16 @@ app.get("/dm/:receiver_id", async (req: Request, res: Response) => {
 
   const messages = await cassandraService.getDMmessages(user, receiver_id);
 
-  res.json(messages);
+  const you = await cassandraService.getUserInfoById(user);
+  const other = await cassandraService.getUserInfoById(receiver_id);
+  
+  res.json({
+    messages: messages,
+    users: {
+      you: you,
+      other: other,
+    }
+  });
 });
 
 app.get("/group/:group_id", async (req: Request, res: Response) => {
@@ -129,6 +150,32 @@ app.post("/test", (req: Request, res: Response) => {
     userId: user,
   });
 });
+
+rabbitMQService.startConsuming(async (msg)  => {
+  console.log(`Received message: ${msg}`);
+  let message;
+
+  try {
+    message = JSON.parse(msg);
+  }
+  catch (e) {
+    console.error(`Invalid message received: ${msg}`);
+    return;
+  }
+
+  if (!message.id || !message.name || !message.nickname || !message.picture) {
+    console.error(`Invalid message received: ${msg}`);
+    return;
+  }
+
+  await cassandraService.InsertOrUpdateUserInfo(
+    message.id,
+    message.name,
+    message.nickname,
+    message.picture
+  );
+});
+
 
 const server = app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
