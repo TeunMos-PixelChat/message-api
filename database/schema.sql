@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS pixelchat_message.direct_chat_messages (
     message TEXT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
-    PRIMARY KEY ((sender_id, receiver_id), created_at)
+    PRIMARY KEY ((sender_id, receiver_id), created_at, id)
 ) WITH CLUSTERING ORDER BY (created_at DESC);
 
 -- GroupChatMessages table
@@ -32,6 +32,5 @@ CREATE TABLE IF NOT EXISTS pixelchat_message.group_chat_messages (
     message TEXT,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
-    PRIMARY KEY ((group_id), created_at)
+    PRIMARY KEY ((group_id, sender_id), created_at, id)
 ) WITH CLUSTERING ORDER BY (created_at DESC);
-

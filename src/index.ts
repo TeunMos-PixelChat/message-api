@@ -84,6 +84,24 @@ app.post("/dm", async (req: Request, res: Response) => {
   res.status(200).json({ message: "Message sent" });
 });
 
+app.delete("/dm/:message_id", async (req: Request, res: Response) => {
+  const message_id = req.params.message_id;
+  const user = useAuthUser(req, res);
+  if (!user) return; // unauthorized
+
+  const receiver_id = req.query.receiver_id as string;
+  const created_at = req.query.created_at as string;
+
+  if (!message_id || !receiver_id || !created_at) {
+    res.status(400).json({ message: "Invalid request" });
+    return;
+  }
+  
+  const deleteMessage = await cassandraService.deleteDmMessage(message_id, user, receiver_id, new Date(created_at));
+
+  res.status(200).json({ message: "Message deleted", res: deleteMessage });	
+});
+
 app.post("/group", async (req: Request, res: Response) => {
   const body = req.body;
   const user = useAuthUser(req, res);
@@ -117,7 +135,8 @@ app.get("/dm/:receiver_id", async (req: Request, res: Response) => {
   const other = await cassandraService.getUserInfoById(receiver_id);
   
   res.json({
-    messages: messages,
+    messages: messages.messages,
+    nextPageStates: messages.nextPageStates,
     users: {
       you: you,
       other: other,

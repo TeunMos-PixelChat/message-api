@@ -43,11 +43,11 @@ export default class CassandraService {
     ]);
   }
 
-  async deleteDmMessage(messageId: string, userId: string) {
+  async deleteDmMessage(messageId: string, sender_id: string, receiver_id: string, created_at: Date) {
     const query = `DELETE FROM pixelchat_message.direct_chat_messages 
-      WHERE id = ? AND (sender_id = ? OR receiver_id = ?)`;
+      WHERE id = ? AND sender_id = ? AND receiver_id = ? AND created_at = ?`;
 
-    const queryparams = [messageId, userId, userId];
+    const queryparams = [messageId, sender_id, receiver_id, created_at];
 
     return this.client.execute(query, queryparams, { prepare: true });
   }
