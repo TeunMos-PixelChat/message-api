@@ -23,12 +23,17 @@ config:
 scenarios:
   - flow:
       - loop:
-        # - get:
-        #     url: "/"
         - post:
-            url: "/test"
+            url: "/dm"
             headers:
               x-user-id: "test|123"
             json:
-              message: "Hello, World!"
+              message: "testing, testing, 1, 2, 3"
+              receiver_id: "test|456"
+        - get:
+            url: "/dm/test|456"
+            headers:
+              x-user-id: "test|123"
+        - think: 1
         count: 10
+
