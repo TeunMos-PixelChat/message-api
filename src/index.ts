@@ -182,17 +182,34 @@ rabbitMQService.startConsuming(async (msg)  => {
     return;
   }
 
-  if (!message.id || !message.name || !message.nickname || !message.picture) {
-    console.error(`Invalid message received: ${msg}`);
-    return;
+  const action: "delete" | "update" | "deleteAll" | undefined = message.action;
+  if (!action) {
+    throw new Error(`Invalid message received: ${msg}`);
   }
+  
+  if (action === "delete") {
+    if (!message.userId) {
+      throw new Error(`Delete message received without userId: ${msg}`);
+    }
+  }
+  if (action === "update") {
+    if (!message.user) {
+      throw new Error(`Update message received without user: ${msg}`);
+    }
 
-  await cassandraService.InsertOrUpdateUserInfo(
-    message.id,
-    message.name,
-    message.nickname,
-    message.picture
-  );
+    const user = message.user;
+
+    if (!user.id || !user.name || !user.nickname || !user.picture) {
+      throw new Error(`Update message received with invalid user: ${msg}`);
+    }
+  
+    await cassandraService.InsertOrUpdateUserInfo(
+      user.id,
+      user.name,
+      user.nickname,
+      user.picture
+    );
+  }
 });
 
 
