@@ -191,7 +191,19 @@ rabbitMQService.startConsuming(async (msg)  => {
     if (!message.userId) {
       throw new Error(`Delete message received without userId: ${msg}`);
     }
+
+    await cassandraService.DeleteUserInfo(message.userId);
   }
+
+  if (action === "deleteAll") {
+    if (!message.userId) {
+      throw new Error(`DeleteAll message received without userId: ${msg}`);
+    }
+
+    await cassandraService.ClearAllUserData(message.userId);
+  }
+
+
   if (action === "update") {
     if (!message.user) {
       throw new Error(`Update message received without user: ${msg}`);
