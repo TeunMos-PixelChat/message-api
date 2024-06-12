@@ -45,11 +45,18 @@ export default class CassandraService {
 
   async deleteAllDmMessagesByUser(user_id: string) {
     const query = `DELETE FROM pixelchat_message.direct_chat_messages 
-      WHERE sender_id = ? OR receiver_id = ?`;
+      WHERE sender_id = ? AND receiver_id = ?`;
 
-    const queryparams = [user_id, user_id];
 
-    return this.client.execute(query, queryparams, { prepare: true });
+    const users = await this.getAllUsersInfo();
+
+    for (const user of users) {
+      await this.client.execute(query, [user_id, user.id], { prepare: true });
+      await this.client.execute(query, [user.id, user_id], { prepare: true });
+    }
+
+    // const queryparams = [user_id, user_id];
+    // return this.client.execute(query, queryparams, { prepare: true });
   }
 
   async deleteDmMessage(messageId: string, sender_id: string, receiver_id: string, created_at: Date) {
@@ -137,6 +144,14 @@ export default class CassandraService {
     const user = await this.client.execute(query, queryparams, { prepare: true });
 
     return user.rows[0];
+  }
+
+  async getAllUsersInfo() {
+    const query = `SELECT * FROM pixelchat_message.user_info`;
+
+    const users = await this.client.execute(query, [], { prepare: true });
+
+    return users.rows;
   }
 
   async InsertOrUpdateUserInfo(user_id: string, name: string, nickname: string, picture: string) {
