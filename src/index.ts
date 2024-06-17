@@ -186,41 +186,40 @@ rabbitMQService.startConsuming(async (msg)  => {
   if (!action) {
     throw new Error(`Invalid message received: ${msg}`);
   }
-  
-  if (action === "delete") {
-    if (!message.userId) {
-      throw new Error(`Delete message received without userId: ${msg}`);
-    }
 
-    await cassandraService.DeleteUserInfo(message.userId);
-  }
+  switch (action) {
+    case "delete":
+      if (!message.userId) {
+        throw new Error(`Delete message received without userId: ${msg}`);
+      }
+      await cassandraService.DeleteUserInfo(message.userId);
+      break;
 
-  if (action === "deleteAll") {
-    if (!message.userId) {
-      throw new Error(`DeleteAll message received without userId: ${msg}`);
-    }
+    case "deleteAll":
+      if (!message.userId) {
+        throw new Error(`DeleteAll message received without userId: ${msg}`);
+      }
+      await cassandraService.ClearAllUserData(message.userId);
+      break;
 
-    await cassandraService.ClearAllUserData(message.userId);
-  }
+    case "update":
+      if (!message.user) {
+        throw new Error(`Update message received without user: ${msg}`);
+      }
+      const user = message.user;
+      if (!user.id || !user.name || !user.nickname || !user.picture) {
+        throw new Error(`Update message received with invalid user: ${msg}`);
+      }
+      await cassandraService.InsertOrUpdateUserInfo(
+        user.id,
+        user.name,
+        user.nickname,
+        user.picture
+      );
+      break;
 
-
-  if (action === "update") {
-    if (!message.user) {
-      throw new Error(`Update message received without user: ${msg}`);
-    }
-
-    const user = message.user;
-
-    if (!user.id || !user.name || !user.nickname || !user.picture) {
-      throw new Error(`Update message received with invalid user: ${msg}`);
-    }
-  
-    await cassandraService.InsertOrUpdateUserInfo(
-      user.id,
-      user.name,
-      user.nickname,
-      user.picture
-    );
+    default:
+      throw new Error(`Invalid action received: ${action}`);
   }
 });
 
