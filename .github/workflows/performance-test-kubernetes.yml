@@ -20,7 +20,7 @@ jobs:
         - name: install artillery
           run: npm install -g artillery
         - name: ping the service to check if it is up
-          run: curl http://10.43.192.163:3001
+          run: curl http://10.43.63.25:3001
         - name: run the performance test
           run: npm run performance
           continue-on-error: true
