@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/auth0": "^3.3.10",
-    "@types/node": "^20.11.21",
+    "@types/node": "^22.4.1",
     "amqplib": "^0.10.4",
     "cassandra-driver": "^4.7.2",
     "cors": "^2.8.5",
